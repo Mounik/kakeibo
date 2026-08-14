@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ - La méthode Kakeibo | Kakeibo Budget</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <style>
+        .faq-navbar { background: #0f172a; }
+        .faq-navbar .navbar-brand { color: #fff; font-weight: 700; }
+        .faq-navbar .navbar-brand i { color: #14b8a6; }
+        .faq-hero { background: linear-gradient(135deg, #0f172a 0%, #134e4a 100%); color: #f8fafc; }
+        .faq-hero .display-6 { font-weight: 700; }
+        .accordion-button:not(.collapsed) { background: rgba(20, 184, 166, 0.1); color: #0f766e; }
+        .accordion-button:focus { box-shadow: 0 0 0 0.25rem rgba(20, 184, 166, 0.25); }
+        .kakeibo-category-card { border-left: 4px solid; }
+        .cat-needs { border-color: #ef4444; }
+        .cat-wants { border-color: #f59e0b; }
+        .cat-culture { border-color: #8b5cf6; }
+        .cat-unexpected { border-color: #ec4899; }
+        .step-number {
+            width: 36px; height: 36px; border-radius: 50%;
+            background: #14b8a6; color: #fff;
+            display: inline-flex; align-items: center; justify-content: center;
+            font-weight: 700;
+        }
+        .q4-question { background: #f8fafc; border: 1px dashed #14b8a6; }
+    </style>
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-expand-lg faq-navbar">
+    <div class="container">
+        <a class="navbar-brand" href="{{ url_for('common.faq') }}">
+            <i class="bi bi-piggy-bank me-2"></i>Kakeibo Budget
+        </a>
+        <div class="ms-auto d-flex gap-2">
+            {% if current_user.is_authenticated %}
+            <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline-light btn-sm">
+                <i class="bi bi-speedometer2 me-1"></i>Tableau de bord
+            </a>
+            {% else %}
+            <a href="{{ url_for('auth.login') }}" class="btn btn-outline-light btn-sm">Connexion</a>
+            <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-sm">Créer un compte</a>
+            {% endif %}
+        </div>
+    </div>
+</nav>
+
+<header class="faq-hero py-5">
+    <div class="container">
+        <div class="text-center">
+            <h1 class="display-6 mb-3"><i class="bi bi-journal-text me-2"></i>La méthode Kakeibo</h1>
+            <p class="lead mb-2 mx-auto" style="max-width: 760px;">
+                Une méthode japonaise de gestion de budget simple et consciente,
+                créée en 1904 par Makoto Hani. Elle repose sur le journal intime
+                de vos finances : chaque mois, on planifie, on suit, on analyse.
+            </p>
+            <p class="small mb-0 opacity-75"><i class="bi bi-translate me-1"></i>Kakeibo (家計簿) signifie littéralement « registre des finances du foyer ».</p>
+        </div>
+    </div>
+</header>
+
+<div class="container py-5">
+
+    <!-- Le principe -->
+    <section class="mb-5">
+        <h2 class="h4 mb-4"><i class="bi bi-bulb text-success me-2"></i>Le principe en quelques mots</h2>
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h3 class="h6 text-uppercase text-muted"><i class="bi bi-pencil-square me-1"></i>Avant tout dépenser</h3>
+                        <p class="mb-0 small">
+                            Chaque début de mois, répondez aux <strong>quatre questions</strong> :
+                            cela transforme la gestion de l'argent en une pratique réfléchie
+                            plutôt qu'une contrainte subie.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h3 class="h6 text-uppercase text-muted"><i class="bi bi-journal-medical me-1"></i>Écrire chaque dépense</h3>
+                        <p class="mb-0 small">
+                            Notez au quotidien vos dépenses en les classant par grande famille.
+                            Écrire rend les dépenses <strong>visibles</strong>, et ce qui est
+                            visible devient contrôlable.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h3 class="h6 text-uppercase text-muted"><i class="bi bi-bar-chart me-1"></i>Analyser en fin de mois</h3>
+                        <p class="mb-0 small">
+                            Faites votre bilan mensuel : combien d'argent est resté ?
+                            Où est-il parti ? Comparez le planifié au réel.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h3 class="h6 text-uppercase text-muted"><i class="bi bi-arrow-repeat me-1"></i>Améliorer en continu</h3>
+                        <p class="mb-0 small">
+                            Notez vos questions et vos axes d'amélioration pour le mois
+                            suivant. Le Kakeibo est une <strong>spirale vertueuse</strong> :
+                            chaque mois est meilleur que le précédent.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Les 4 questions -->
+    <section class="mb-5">
+        <h2 class="h4 mb-4"><i class="bi bi-question-circle text-primary me-2"></i>Les quatre questions du début de mois</h2>
+        <div class="row g-3">
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 shadow-sm q4-question">
+                    <div class="card-body text-center">
+                        <span class="step-number mb-2">1</span>
+                        <h3 class="h6 mt-2">Combien ai-je ?</h3>
+                        <p class="small text-muted mb-0">Faites le point sur vos comptes et vos revenus du mois.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 shadow-sm q4-question">
+                    <div class="card-body text-center">
+                        <span class="step-number mb-2">2</span>
+                        <h3 class="h6 mt-2">Combien voudrais-je économiser ?</h3>
+                        <p class="small text-muted mb-0">Fixez un objectif d'épargne réaliste pour le mois.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 shadow-sm q4-question">
+                    <div class="card-body text-center">
+                        <span class="step-number mb-2">3</span>
+                        <h3 class="h6 mt-2">Combien vais-je dépenser ?</h3>
+                        <p class="small text-muted mb-0">Estimez vos dépenses à venir : c'est votre plan.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 shadow-sm q4-question">
+                    <div class="card-body text-center">
+                        <span class="step-number mb-2">4</span>
+                        <h3 class="h6 mt-2">Comment puis-je améliorer mes finances ?</h3>
+                        <p class="small text-muted mb-0">Notez une intention concrète pour ce mois.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Les 4 catégories -->
+    <section class="mb-5">
+        <h2 class="h4 mb-4"><i class="bi bi-tags text-warning me-2"></i>Les quatre grandes familles de dépenses</h2>
+        <p class="text-muted">
+            Le Kakeibo classe chaque dépense dans l'une de ces quatre catégories.
+            L'objectif n'est pas de tout supprimer, mais d'équilibrer
+            <strong>l'essentiel</strong> et <strong>le plaisir</strong> en pleine conscience.
+        </p>
+        <div class="row g-3">
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 shadow-sm kakeibo-category-card cat-needs">
+                    <div class="card-body">
+                        <h3 class="h6"><i class="bi bi-house-heart me-1"></i>Besoins</h3>
+                        <p class="small text-muted mb-2">L'essentiel pour vivre : logement, alimentation, santé, énergie, transport.</p>
+                        <span class="badge text-bg-light">Non négociable</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 shadow-sm kakeibo-category-card cat-wants">
+                    <div class="card-body">
+                        <h3 class="h6"><i class="bi bi-cup-straw me-1"></i>Envies</h3>
+                        <p class="small text-muted mb-2">Les plaisirs : restaurants, shopping, vêtements, loisirs.</p>
+                        <span class="badge text-bg-light">Levier d'ajustement n°1</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 shadow-sm kakeibo-category-card cat-culture">
+                    <div class="card-body">
+                        <h3 class="h6"><i class="bi bi-book me-1"></i>Culture</h3>
+                        <p class="small text-muted mb-2">S'enrichir : livres, musique, cinéma, formations.</p>
+                        <span class="badge text-bg-light">Investissement personnel</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 shadow-sm kakeibo-category-card cat-unexpected">
+                    <div class="card-body">
+                        <h3 class="h6"><i class="bi bi-lightning me-1"></i>Imprévus</h3>
+                        <p class="small text-muted mb-2">Les urgences : réparations, frais exceptionnels.</p>
+                        <span class="badge text-bg-light">Prévoir un coussin</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Comment utiliser l'app -->
+    <section class="mb-5">
+        <h2 class="h4 mb-4"><i class="bi bi-phone text-info me-2"></i>Comment utiliser cette application</h2>
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <ol class="list-unstyled mb-0">
+                    <li class="d-flex gap-3 mb-3">
+                        <span class="step-number flex-shrink-0">1</span>
+                        <div>
+                            <strong>Créez votre compte et vos comptes.</strong>
+                            <p class="text-muted small mb-0">Ajoutez vos comptes (courant, épargne, espèces…) dans le menu <em>Comptes</em>.</p>
+                        </div>
+                    </li>
+                    <li class="d-flex gap-3 mb-3">
+                        <span class="step-number flex-shrink-0">2</span>
+                        <div>
+                            <strong>Enregistrez vos revenus.</strong>
+                            <p class="text-muted small mb-0">Salaire, primes, revenus annexes : tout ce qui entre.</p>
+                        </div>
+                    </li>
+                    <li class="d-flex gap-3 mb-3">
+                        <span class="step-number flex-shrink-0">3</span>
+                        <div>
+                            <strong>Notez vos dépenses au quotidien.</strong>
+                            <p class="text-muted small mb-0">Chaque dépense : montant, date, catégorie Kakeibo, commerçant et compte.</p>
+                        </div>
+                    </li>
+                    <li class="d-flex gap-3 mb-3">
+                        <span class="step-number flex-shrink-0">4</span>
+                        <div>
+                            <strong>Répondez aux quatre questions en début de mois.</strong>
+                            <p class="text-muted small mb-0">Dans le menu <em>Journal Kakeibo</em>, renseignez vos réponses mensuelles.</p>
+                        </div>
+                    </li>
+                    <li class="d-flex gap-3 mb-3">
+                        <span class="step-number flex-shrink-0">5</span>
+                        <div>
+                            <strong>Suivez vos budgets et objectifs.</strong>
+                            <p class="text-muted small mb-0">Fixez des budgets par catégorie et des objectifs d'épargne : l'app vous alerte quand vous approchez des limites.</p>
+                        </div>
+                    </li>
+                    <li class="d-flex gap-3 mb-3">
+                        <span class="step-number flex-shrink-0">6</span>
+                        <div>
+                            <strong>Analysez avec les statistiques.</strong>
+                            <p class="text-muted small mb-0">Dépenses par catégorie, évolution mensuelle et annuelle, taux d'épargne : le tableau de bord et les graphiques font le bilan pour vous.</p>
+                        </div>
+                    </li>
+                    <li class="d-flex gap-3">
+                        <span class="step-number flex-shrink-0">7</span>
+                        <div>
+                            <strong>Générez votre bilan mensuel.</strong>
+                            <p class="text-muted small mb-0">En fin de mois, le journal Kakeibo compare le planifié au réel et garde la trace de vos notes et recommandations.</p>
+                        </div>
+                    </li>
+                </ol>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section>
+        <h2 class="h4 mb-4"><i class="bi bi-patch-question text-danger me-2"></i>Questions fréquentes</h2>
+        <div class="accordion" id="faqAccordion">
+            <div class="accordion-item">
+                <h3 class="accordion-header">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#q1">
+                        D'où vient le Kakeibo ?
+                    </button>
+                </h3>
+                <div id="q1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        La méthode a été créée en 1904 par <strong>Makoto Hani</strong>, la
+                        première femme journaliste économique du Japon. Il s'agit du premier
+                        « journal de budget » pensé pour les foyers, alliant pragmatisme
+                        comptable et réflexion personnelle.
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h3 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#q2">
+                        Est-ce une méthode de privation ?
+                    </button>
+                </h3>
+                <div id="q2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        Non. Le Kakeibo n'interdit rien : il rend vos choix
+                        <strong>conscients</strong>. Les « envies » font partie du système.
+                        L'idée est d'équilibrer vos quatre catégories plutôt que de vous
+                        priver, ce qui rend la démarche tenable sur la durée.
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h3 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#q3">
+                        Faut-il noter chaque dépense, même les petites ?
+                    </button>
+                </h3>
+                <div id="q3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        Oui, c'est tout l'intérêt : ce sont souvent les petits montants
+                        répétés (cafés, snacks, petites courses) qui pèsent le plus.
+                        Dans l'application, enregistrer une dépense prend quelques secondes.
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h3 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#q4">
+                        Quelle est la différence avec un simple budget ?
+                    </button>
+                </h3>
+                <div id="q4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        Un budget se limite à fixer des limites. Le Kakeibo ajoute une
+                        <strong>réflexion mensuelle</strong> : planification au début du mois,
+                        bilan en fin de mois, et amélioration continue. C'est une démarche
+                        d'auto-analyse, pas seulement une contrainte.
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h3 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#q5">
+                        Comment laisser le Kakeibo travailler pour moi ?
+                    </button>
+                </h3>
+                <div id="q5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        <ul class="mb-2">
+                            <li>Répondez aux 4 questions <strong>dès le 1er du mois</strong>.</li>
+                            <li>Saisissez vos dépenses <strong>au fil de l'eau</strong>.</li>
+                            <li>Surveillez vos <strong>budgets</strong> : les alertes vous préviennent.</li>
+                            <li>Générez votre <strong>bilan mensuel</strong> et lisez les recommandations.</li>
+                            <li>Gardez l'objectif simple : <em>économiser sans souffrir</em>.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h3 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#q6">
+                        Puis-je importer mes opérations bancaires ?
+                    </button>
+                </h3>
+                <div id="q6" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        Oui. Le menu <em>Import / Export</em> accepte les fichiers
+                        <strong>CSV</strong>, <strong>OFX</strong> et <strong>QIF</strong>,
+                        et permet d'exporter vos données en CSV, Excel ou PDF.
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h3 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#q7">
+                        Mes données sont-elles privées ?
+                    </button>
+                </h3>
+                <div id="q7" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        Oui. Chaque utilisateur n'accède qu'à ses propres données
+                        (comptes, dépenses, budgets). L'application est conçue
+                        multi-utilisateurs avec isolation stricte par compte.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="text-center mt-5">
+        {% if current_user.is_authenticated %}
+        <a href="{{ url_for('dashboard.index') }}" class="btn btn-primary">
+            <i class="bi bi-piggy-bank me-1"></i>Passer à la pratique
+        </a>
+        {% else %}
+        <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg">
+            <i class="bi bi-rocket-takeoff me-1"></i>Créer mon compte et commencer
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+<footer class="py-4 mt-4 text-center text-muted small" style="background: #0f172a; color: #94a3b8;">
+    Kakeibo Budget &mdash; La méthode japonaise de gestion de budget &middot;
+    <a href="{{ url_for('common.faq') }}" class="text-reset">FAQ</a>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

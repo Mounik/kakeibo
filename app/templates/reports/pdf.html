@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Kakeibo Budget - Rapport {{ data_type }}</title>
+    <style>
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 12px; color: #1e293b; }
+        h1 { font-size: 20px; color: #0f766e; margin-bottom: 4px; }
+        .meta { color: #64748b; font-size: 11px; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+        th { background: #f1f5f9; text-align: left; padding: 8px; font-size: 11px; text-transform: uppercase; }
+        td { padding: 8px; border-bottom: 1px solid #e2e8f0; }
+        .amount { text-align: right; }
+        .danger { color: #dc2626; }
+        .success { color: #16a34a; }
+        .total { font-weight: bold; font-size: 14px; margin-top: 12px; }
+    </style>
+</head>
+<body>
+    <h1>Kakeibo Budget</h1>
+    <div class="meta">Rapport {{ data_type }} · Généré le {{ today.strftime('%d/%m/%Y') }}</div>
+    {% if rows %}
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Type</th>
+                <th class="amount">Montant</th>
+                <th>Catégorie</th>
+                <th>Commerçant / Source</th>
+                <th>Compte</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in rows %}
+            <tr>
+                <td>{{ row.date }}</td>
+                <td>{{ row.type }}</td>
+                <td class="amount {{ 'danger' if row.type == 'Dépense' else 'success' }}">{{ '%.2f'|format(row.amount) }} €</td>
+                <td>{{ row.category }}</td>
+                <td>{{ row.merchant }}</td>
+                <td>{{ row.account }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="total">Total : {{ '%.2f'|format(rows | sum(attribute='amount')) }} €</div>
+    {% else %}
+    <p>Aucune donnée à afficher.</p>
+    {% endif %}
+</body>
+</html>

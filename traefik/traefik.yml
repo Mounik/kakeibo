@@ -1,0 +1,39 @@
+# Configuration Traefik pour Kakeibo Budget
+# Voir : https://doc.traefik.io/traefik/
+
+global:
+  sendAnonymousUsage: false
+
+entryPoints:
+  web:
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+          permanent: true
+  websecure:
+    address: ":443"
+  local:
+    address: ":8081"
+
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      email: "${TRAEFIK_EMAIL:-admin@kakeibo.local}"
+      storage: /etc/traefik/acme/acme.json
+      httpChallenge:
+        entryPoint: web
+      # Staging server for tests (production: comment out)
+      # caServer: https://acme-staging-v02.api.letsencrypt.org/directory
+
+providers:
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+    exposedByDefault: false
+    watch: true
+
+api:
+  dashboard: true
+  insecure: true

@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}Page introuvable{% endblock %}
+{% block auth_content %}
+<div class="text-center auth-shell-inner">
+    <h1 class="display-1 fw-bold text-primary">404</h1>
+    <h2 class="h4">Page introuvable</h2>
+    <p class="text-muted">La page que vous recherchez n'existe pas ou a été déplacée.</p>
+    <a href="{{ url_for('dashboard.index') }}" class="btn btn-primary"><i class="bi bi-house me-2"></i>Retour à l'accueil</a>
+</div>
+{% endblock %}

@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% block page_title %}Bilan {{ review.month|string + '/' + review.year|string }}{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-journal-bookmark me-2"></i>Journal de {{ review.month|string + '/' + review.year|string }}</h5>
+                <a href="{{ url_for('kakeibo.index') }}" class="btn btn-sm btn-light"><i class="bi bi-arrow-left me-1"></i>Retour</a>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="border rounded p-3 h-100">
+                            <div class="small fw-semibold text-muted">1. Combien ai-je ?</div>
+                            <div>{{ review.q1_income or '—' }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="border rounded p-3 h-100">
+                            <div class="small fw-semibold text-muted">2. Combien voudrais-je économiser ?</div>
+                            <div>{{ review.q2_savings_target or '—' }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="border rounded p-3 h-100">
+                            <div class="small fw-semibold text-muted">3. Combien ai-je dépensé ?</div>
+                            <div>{{ review.q3_planned_expenses or '—' }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="border rounded p-3 h-100">
+                            <div class="small fw-semibold text-muted">4. Comment améliorer ?</div>
+                            <div>{{ review.q4_improvement or '—' }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3 mt-2 text-center">
+                    <div class="col-3">
+                        <div class="border rounded p-3">
+                            <div class="small text-muted">Revenus</div>
+                            <div class="fw-bold text-success">{{ '%.2f'|format(review.actual_income or 0) }} €</div>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="border rounded p-3">
+                            <div class="small text-muted">Dépenses</div>
+                            <div class="fw-bold text-danger">{{ '%.2f'|format(review.actual_expenses or 0) }} €</div>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="border rounded p-3">
+                            <div class="small text-muted">Épargne</div>
+                            <div class="fw-bold text-primary">{{ '%.2f'|format(review.actual_savings or 0) }} €</div>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="border rounded p-3">
+                            <div class="small text-muted">Taux</div>
+                            <div class="fw-bold">{{ '%.1f'|format(review.savings_rate) }}%</div>
+                        </div>
+                    </div>
+                </div>
+
+                {% if review.notes %}
+                <div class="mt-4">
+                    <div class="small fw-semibold text-muted">Notes personnelles</div>
+                    <div class="border rounded p-3 mt-1">{{ review.notes }}</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

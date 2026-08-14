@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% from 'macros.html' import render_field, format_amount, empty_state %}
+{% block page_title %}Comptes{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="text-muted">Solde total : <span class="fw-semibold text-dark">{{ '%.2f'|format(total_balance) }} €</span></div>
+    <a href="{{ url_for('accounts.create') }}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Nouveau compte</a>
+</div>
+
+<form method="get" class="row g-2 mb-4" novalidate>
+    <div class="col-auto">{{ form.type(class='form-select form-select-sm') }}</div>
+    <div class="col-auto">{{ form.is_active(class='form-select form-select-sm') }}</div>
+    <div class="col-auto"><button type="submit" class="btn btn-sm btn-outline-secondary">Filtrer</button></div>
+</form>
+
+{% if accounts %}
+<div class="row g-3">
+    {% for account in accounts %}
+    <div class="col-md-6 col-xl-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div class="d-flex align-items-center">
+                        <div class="account-icon" style="background-color: {{ account.color }}20; color: {{ account.color }}">
+                            <i class="bi bi-{{ account.icon or 'bank' }}"></i>
+                        </div>
+                        <div class="ms-2">
+                            <div class="fw-semibold">{{ account.name }}</div>
+                            <div class="small text-muted text-capitalize">{{ account.type.value }}</div>
+                        </div>
+                    </div>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-light" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="{{ url_for('accounts.edit', id=account.id) }}"><i class="bi bi-pencil me-2"></i>Modifier</a></li>
+                            <li>
+                                <form method="post" action="{{ url_for('accounts.delete', id=account.id) }}"
+                                      onsubmit="return confirm('Supprimer ce compte ?');">
+                                    <button type="submit" class="dropdown-item text-danger"><i class="bi bi-trash me-2"></i>Supprimer</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <div class="display-6 fw-bold {{ 'text-danger' if account.balance < 0 else '' }}">
+                        {{ '%.2f'|format(account.balance) }} <span class="fs-6 text-muted">{{ account.currency }}</span>
+                    </div>
+                    <div class="small text-muted">
+                        {% if account.is_main %}<span class="badge bg-primary me-1">Principal</span>{% endif %}
+                        {% if not account.is_active %}<span class="badge bg-secondary">Inactif</span>{% endif %}
+                        {% if account.institution %}{{ account.institution }}{% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+{{ empty_state('bi-wallet2', 'Aucun compte trouvé.', url_for('accounts.create'), 'Créer un compte') }}
+{% endif %}
+{% endblock %}

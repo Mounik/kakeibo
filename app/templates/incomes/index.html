@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% from 'macros.html' import render_pagination, format_amount, empty_state %}
+{% block page_title %}Revenus{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="text-muted">Total : <span class="fw-semibold text-success">{{ '%.2f'|format(total) }} €</span></div>
+    <a href="{{ url_for('incomes.create') }}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Nouveau revenu</a>
+</div>
+
+<details class="mb-3">
+    <summary class="btn btn-sm btn-outline-secondary">Filtres</summary>
+    <form method="get" class="row g-2 mt-2 card card-body bg-light" novalidate>
+        {{ form.hidden_tag() }}
+        <div class="col-md-3">{{ form.start_date(class='form-control form-control-sm', type='date') }}</div>
+        <div class="col-md-3">{{ form.end_date(class='form-control form-control-sm', type='date') }}</div>
+        <div class="col-md-3">{{ form.account_id(class='form-select form-select-sm') }}</div>
+        <div class="col-md-3">{{ form.recurrence(class='form-select form-select-sm') }}</div>
+        <div class="col-md-3">{{ form.min_amount(class='form-control form-control-sm', placeholder='Montant min') }}</div>
+        <div class="col-md-3">{{ form.max_amount(class='form-control form-control-sm', placeholder='Montant max') }}</div>
+        <div class="col-md-3"><button type="submit" class="btn btn-sm btn-primary w-100">Filtrer</button></div>
+    </form>
+</details>
+
+{% if incomes %}
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Date</th>
+                    <th>Source</th>
+                    <th>Compte</th>
+                    <th>Récurrence</th>
+                    <th>Description</th>
+                    <th class="text-end">Montant</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for income in incomes %}
+                <tr>
+                    <td>{{ income.date.strftime('%d/%m/%Y') }}</td>
+                    <td class="fw-semibold">{{ income.source }}</td>
+                    <td>{{ income.account.name if income.account else '-' }}</td>
+                    <td>
+                        {% if income.is_recurring %}
+                        <span class="badge bg-primary text-capitalize">{{ income.recurrence.value }}</span>
+                        {% else %}
+                        <span class="badge bg-light text-muted">Unique</span>
+                        {% endif %}
+                    </td>
+                    <td class="small text-muted">{{ income.description or '-' }}</td>
+                    <td class="text-end text-success fw-semibold">+{{ '%.2f'|format(income.amount) }} €</td>
+                    <td class="text-end">
+                        <a href="{{ url_for('incomes.edit', id=income.id) }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i></a>
+                        <form method="post" action="{{ url_for('incomes.delete', id=income.id) }}" class="d-inline"
+                              onsubmit="return confirm('Supprimer ce revenu ?');">
+                            <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{{ render_pagination(pagination) }}
+{% else %}
+{{ empty_state('bi-arrow-down-circle', 'Aucun revenu enregistré.', url_for('incomes.create'), 'Ajouter un revenu') }}
+{% endif %}
+{% endblock %}

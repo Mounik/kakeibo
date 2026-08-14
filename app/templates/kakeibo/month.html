@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block page_title %}Journal du mois{% endblock %}
+{% block content %}
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div id="kakeibo-form-container">
+            {% include 'kakeibo/_month_form.html' %}
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div id="bilan-container">
+            {% include 'kakeibo/_bilan.html' %}
+        </div>
+    </div>
+</div>
+{% endblock %}

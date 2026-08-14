@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% from 'macros.html' import render_field %}
+{% block page_title %}Import / Export{% endblock %}
+{% block content %}
+<div class="row g-4">
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header"><h5 class="mb-0"><i class="bi bi-cloud-upload me-2"></i>Importer</h5></div>
+            <div class="card-body">
+                <p class="text-muted small">
+                    Importez vos transactions depuis un fichier <strong>CSV</strong>, <strong>OFX</strong> ou <strong>QIF</strong>.
+                </p>
+                <form method="post" action="{{ url_for('reports.import_file') }}" enctype="multipart/form-data" novalidate>
+                    {{ import_form.hidden_tag() }}
+                    {{ render_field(import_form.type) }}
+                    <div class="mb-3">
+                        {{ import_form.file.label(class='form-label') }}
+                        {{ import_form.file(class='form-control' + (' is-invalid' if import_form.file.errors else ''), accept='.csv,.ofx,.qif') }}
+                        {% for error in import_form.file.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                    </div>
+                    {{ import_form.submit(class='btn btn-primary') }}
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header"><h5 class="mb-0"><i class="bi bi-cloud-download me-2"></i>Exporter</h5></div>
+            <div class="card-body">
+                <p class="text-muted small">
+                    Exportez vos données aux formats <strong>CSV</strong>, <strong>Excel</strong> ou <strong>PDF</strong>.
+                </p>
+                <form method="get" action="{{ url_for('reports.export', fmt='csv') }}" novalidate>
+                    {{ export_form.hidden_tag() }}
+                    {{ render_field(export_form.type) }}
+                    <div class="row">
+                        <div class="col-md-6">{{ render_field(export_form.start_date, type='date') }}</div>
+                        <div class="col-md-6">{{ render_field(export_form.end_date, type='date') }}</div>
+                    </div>
+                    <div class="d-flex gap-2 mt-2">
+                        <button type="submit" class="btn btn-success" name="format" value="csv"><i class="bi bi-filetype-csv me-1"></i>CSV</button>
+                        <button type="submit" class="btn btn-primary" formaction="{{ url_for('reports.export', fmt='xlsx') }}"><i class="bi bi-file-earmark-excel me-1"></i>Excel</button>
+                        <button type="submit" class="btn btn-danger" formaction="{{ url_for('reports.export', fmt='pdf') }}"><i class="bi bi-file-earmark-pdf me-1"></i>PDF</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

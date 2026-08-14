@@ -1,0 +1,66 @@
+<div class="card shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="bi bi-clipboard-data me-2"></i>Bilan du mois</h5>
+        <form method="post" action="{{ url_for('kakeibo.generate') }}" class="d-inline"
+              hx-post="{{ url_for('kakeibo.generate') }}" hx-target="#bilan-container" hx-swap="innerHTML">
+            <button type="submit" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-magic me-1"></i>Générer automatiquement
+            </button>
+        </form>
+    </div>
+    <div class="card-body">
+        <div class="row g-3 text-center">
+            <div class="col-6">
+                <div class="border rounded p-3">
+                    <div class="small text-muted">Revenus</div>
+                    <div class="fs-5 fw-bold text-success">{{ '%.2f'|format(stats.income) }} €</div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="border rounded p-3">
+                    <div class="small text-muted">Dépenses</div>
+                    <div class="fs-5 fw-bold text-danger">{{ '%.2f'|format(stats.expenses) }} €</div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="border rounded p-3">
+                    <div class="small text-muted">Épargne</div>
+                    <div class="fs-5 fw-bold text-primary">{{ '%.2f'|format(stats.savings) }} €</div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="border rounded p-3">
+                    <div class="small text-muted">Taux d'épargne</div>
+                    <div class="fs-5 fw-bold {{ 'text-success' if stats.savings_rate >= 20 else 'text-warning' }}">
+                        {{ '%.1f'|format(stats.savings_rate) }}%
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if stats.over_budget %}
+        <div class="alert alert-danger mt-3 mb-0">
+            <div class="fw-semibold mb-1"><i class="bi bi-exclamation-triangle me-1"></i>Budgets dépassés :</div>
+            <ul class="mb-0">
+                {% for item in stats.over_budget %}
+                <li>{{ item.name }} : {{ '%.2f'|format(item.spent) }} € / {{ '%.2f'|format(item.amount) }} €</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% elif stats.income > 0 %}
+        <div class="alert alert-success mt-3 mb-0">
+            <i class="bi bi-check-circle me-1"></i>
+            {% if stats.savings >= 0 %}
+            Bonne maîtrise ! Vous avez épargné {{ '%.2f'|format(stats.savings) }} € ce mois-ci.
+            {% else %}
+            Attention, vos dépenses dépassent vos revenus ce mois-ci.
+            {% endif %}
+        </div>
+        {% else %}
+        <div class="alert alert-info mt-3 mb-0">
+            <i class="bi bi-info-circle me-1"></i>
+            Aucune transaction ce mois-ci pour l'instant.
+        </div>
+        {% endif %}
+    </div>
+</div>

@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% from 'macros.html' import empty_state %}
+{% block page_title %}Catégories{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="text-muted">{{ categories|length }} catégorie(s)</div>
+    <a href="{{ url_for('categories.create') }}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Nouvelle catégorie</a>
+</div>
+
+<form method="get" class="row g-2 mb-4" novalidate>
+    <div class="col-auto">{{ form.kind(class='form-select form-select-sm') }}</div>
+    <div class="col-auto"><button type="submit" class="btn btn-sm btn-outline-secondary">Filtrer</button></div>
+</form>
+
+{% set kakeibo_kinds = ['needs', 'wants', 'culture', 'unexpected'] %}
+{% if categories %}
+{% for kind in kakeibo_kinds %}
+    {% set kind_cats = categories | selectattr('kind.value', 'equalto', kind) | list %}
+    {% if kind_cats %}
+    <div class="card shadow-sm mb-4">
+        <div class="card-header d-flex align-items-center gap-2">
+            {% set meta = kakeibo_categories.get(kind, {}) %}
+            <i class="bi bi-{{ meta.icon or 'tag' }}" style="color: {{ meta.color }};"></i>
+            <span class="fw-semibold">{{ meta.label or kind }}</span>
+            <span class="badge bg-light text-muted ms-auto">{{ kind_cats|length }}</span>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <tbody>
+                    {% for category in kind_cats %}
+                    <tr>
+                        <td class="ps-3">
+                            <span class="badge me-2" style="background-color: {{ category.color }}20; color: {{ category.color }};">
+                                <i class="bi bi-{{ category.icon or 'tag' }}"></i>
+                            </span>
+                            {{ category.name }}
+                            {% if category.is_system %}<span class="badge bg-light text-muted">Système</span>{% endif %}
+                        </td>
+                        <td class="small text-muted">
+                            {% set u = usage.get(category.id) %}
+                            {% if u %}{{ u.count }} dépense(s) · {{ '%.2f'|format(u.total) }} €{% else %}—{% endif %}
+                        </td>
+                        <td class="text-end pe-3">
+                            {% if not category.is_system %}
+                            <a href="{{ url_for('categories.edit', id=category.id) }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i></a>
+                            <form method="post" action="{{ url_for('categories.delete', id=category.id) }}" class="d-inline"
+                                  onsubmit="return confirm('Supprimer cette catégorie ?');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+{% endfor %}
+{% else %}
+{{ empty_state('bi-tags', 'Aucune catégorie trouvée.', url_for('categories.create'), 'Créer une catégorie') }}
+{% endif %}
+{% endblock %}

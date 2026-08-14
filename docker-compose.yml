@@ -1,0 +1,81 @@
+services:
+  kakeibo:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: kakeibo
+    restart: unless-stopped
+    expose:
+      - "5000"
+    environment:
+      - FLASK_ENV=${FLASK_ENV:-production}
+      - SECRET_KEY=${SECRET_KEY:-change-me-in-production}
+      - WTF_CSRF_SECRET_KEY=${WTF_CSRF_SECRET_KEY:-change-me-in-production}
+      - DATABASE_URL=sqlite:////app/data/kakeibo.db
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL:-redis://redis:6379/0}
+      - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND:-redis://redis:6379/0}
+      - SESSION_COOKIE_SECURE=${SESSION_COOKIE_SECURE:-true}
+      - MAIL_SERVER=${MAIL_SERVER:-smtp.gmail.com}
+      - MAIL_PORT=${MAIL_PORT:-587}
+      - MAIL_USE_TLS=${MAIL_USE_TLS:-true}
+      - MAIL_USERNAME=${MAIL_USERNAME:-}
+      - MAIL_PASSWORD=${MAIL_PASSWORD:-}
+      - MAIL_DEFAULT_SENDER=${MAIL_DEFAULT_SENDER:-Kakeibo Budget <noreply@kakeibo.local>}
+      - TRAEFIK_DOMAIN=${TRAEFIK_DOMAIN:-kakeibo.localhost}
+    volumes:
+      - kakeibo_data:/app/data
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.kakeibo.rule=Host(`${TRAEFIK_DOMAIN:-kakeibo.localhost}`)"
+      - "traefik.http.routers.kakeibo.entrypoints=websecure"
+      - "traefik.http.routers.kakeibo.tls.certresolver=letsencrypt"
+      - "traefik.http.services.kakeibo.loadbalancer.server.port=5000"
+      - "traefik.http.middlewares.kakeibo-gzip.compress=true"
+      - "traefik.http.routers.kakeibo.middlewares=kakeibo-gzip"
+      - "traefik.http.routers.kakeibo-local.rule=Host(`${TRAEFIK_DOMAIN:-kakeibo.localhost}`)"
+      - "traefik.http.routers.kakeibo-local.entrypoints=local"
+      - "traefik.http.routers.kakeibo-local.middlewares=kakeibo-gzip"
+      - "traefik.http.routers.kakeibo-local.service=kakeibo"
+    healthcheck:
+      test: ["CMD", "bash", "/app/docker/healthcheck.sh"]
+      interval: 30s
+      timeout: 5s
+      start_period: 40s
+      retries: 3
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:7-alpine
+    container_name: kakeibo-redis
+    restart: unless-stopped
+    expose:
+      - "6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  traefik:
+    image: traefik:v3
+    container_name: kakeibo-traefik
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8081:8081"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+      - traefik_data:/etc/traefik/acme
+    depends_on:
+      - kakeibo
+
+volumes:
+  kakeibo_data:
+  redis_data:
+  traefik_data:

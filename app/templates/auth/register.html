@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title %}Inscription{% endblock %}
+{% block auth_content %}
+<div class="card auth-card shadow-sm">
+    <div class="card-body p-4">
+        <div class="text-center mb-4">
+            <i class="bi bi-piggy-bank auth-icon"></i>
+            <h1 class="h4 mt-2">Créer un compte</h1>
+            <p class="text-muted mb-0">Commencez à gérer vos finances selon la méthode Kakeibo</p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <form method="post" novalidate>
+            {{ form.hidden_tag() }}
+            <div class="mb-3">
+                {{ form.username.label(class='form-label') }}
+                {{ form.username(class='form-control' + (' is-invalid' if form.username.errors else '')) }}
+                {% for error in form.username.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+            </div>
+            <div class="mb-3">
+                {{ form.email.label(class='form-label') }}
+                {{ form.email(class='form-control' + (' is-invalid' if form.email.errors else '')) }}
+                {% for error in form.email.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+            </div>
+            <div class="mb-3">
+                {{ form.password.label(class='form-label') }}
+                {{ form.password(class='form-control' + (' is-invalid' if form.password.errors else '')) }}
+                {% for error in form.password.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+            </div>
+            <div class="mb-3">
+                {{ form.password2.label(class='form-label') }}
+                {{ form.password2(class='form-control' + (' is-invalid' if form.password2.errors else '')) }}
+                {% for error in form.password2.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+            </div>
+            {{ form.submit(class='btn btn-primary w-100') }}
+        </form>
+
+        <div class="text-center mt-3">
+            <p class="mb-0"><a href="{{ url_for('auth.login') }}">Déjà inscrit ? Se connecter</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

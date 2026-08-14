@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+{% block title %}Tableau de bord{% endblock %}
+{% block page_title %}Tableau de bord{% endblock %}
+{% block content %}
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-xl-3">
+        <div class="card stat-card shadow-sm">
+            <div class="card-body">
+                <div class="stat-icon bg-success-subtle text-success"><i class="bi bi-wallet2"></i></div>
+                <div class="stat-value">{{ '%.2f'|format(total_balance) }} €</div>
+                <div class="stat-label">Solde total</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-xl-3">
+        <div class="card stat-card shadow-sm">
+            <div class="card-body">
+                <div class="stat-icon bg-primary-subtle text-primary"><i class="bi bi-arrow-down-circle"></i></div>
+                <div class="stat-value">{{ '%.2f'|format(current_month_income) }} €</div>
+                <div class="stat-label">Revenus du mois</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-xl-3">
+        <div class="card stat-card shadow-sm">
+            <div class="card-body">
+                <div class="stat-icon bg-danger-subtle text-danger"><i class="bi bi-arrow-up-circle"></i></div>
+                <div class="stat-value">{{ '%.2f'|format(current_month_expenses) }} €</div>
+                <div class="stat-label">Dépenses du mois</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-xl-3">
+        <div class="card stat-card shadow-sm">
+            <div class="card-body">
+                <div class="stat-icon bg-warning-subtle text-warning"><i class="bi bi-graph-up-arrow"></i></div>
+                <div class="stat-value">{{ '%.1f'|format(savings_rate) }}%</div>
+                <div class="stat-label">Taux d'épargne</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-bar-chart me-2"></i>Évolution mensuelle</h5>
+                <select id="trend-months" class="form-select form-select-sm w-auto">
+                    <option value="6" selected>6 mois</option>
+                    <option value="12">12 mois</option>
+                    <option value="24">24 mois</option>
+                </select>
+            </div>
+            <div class="card-body">
+                <canvas id="trendChart" height="260"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card shadow-sm">
+            <div class="card-header"><h5 class="mb-0"><i class="bi bi-pie-chart me-2"></i>Dépenses par catégorie</h5></div>
+            <div class="card-body">
+                <canvas id="categoryChart" height="260"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-4">
+        <div class="card shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-piggy-bank me-2"></i>Objectifs d'épargne</h5>
+                <a href="{{ url_for('kakeibo.index') }}" class="small">Voir tout</a>
+            </div>
+            <div class="card-body">
+                {% if savings_goals %}
+                {% for goal in savings_goals %}
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between">
+                        <span class="fw-semibold small">{{ goal.name }}</span>
+                        <span class="small text-muted">{{ '%.0f'|format(goal.progress) }}%</span>
+                    </div>
+                    <div class="progress" style="height: 8px;">
+                        <div class="progress-bar" role="progressbar"
+                             style="width: {{ [goal.progress, 100]|min }}%; background-color: {{ goal.color }};"></div>
+                    </div>
+                    <div class="small text-muted mt-1">{{ '%.2f'|format(goal.current_amount) }} € / {{ '%.2f'|format(goal.target_amount) }} €</div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <p class="text-muted mb-0">Aucun objectif en cours. <a href="{{ url_for('kakeibo.index') }}">Commencer</a></p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card shadow-sm">
+            <div class="card-header"><h5 class="mb-0"><i class="bi bi-calendar-check me-2"></i>Paiements à venir</h5></div>
+            <div class="card-body">
+                {% if upcoming_payments %}
+                <ul class="list-group list-group-flush">
+                    {% for sub in upcoming_payments %}
+                    <li class="list-group-item d-flex justify-content-between px-0">
+                        <span>{{ sub.name }}</span>
+                        <span class="text-danger fw-semibold">{{ '%.2f'|format(sub.amount) }} €</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="text-muted mb-0">Aucun paiement à venir sous 7 jours.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card shadow-sm">
+            <div class="card-header"><h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Dernières dépenses</h5></div>
+            <div class="card-body">
+                {% if recent_expenses %}
+                <ul class="list-group list-group-flush">
+                    {% for exp in recent_expenses %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                        <div class="me-2">
+                            <div class="fw-semibold small">{{ exp.merchant or exp.category.name if exp.category else 'Dépense' }}</div>
+                            <div class="small text-muted">{{ exp.date.strftime('%d/%m/%Y') }}{% if exp.category %} · {{ exp.category.name }}{% endif %}</div>
+                        </div>
+                        <span class="text-danger fw-semibold">-{{ '%.2f'|format(exp.amount) }} €</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="text-muted mb-0">Aucune dépense récente. <a href="{{ url_for('expenses.create') }}">Ajouter</a></p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const trendUrl = "{{ url_for('dashboard.api_monthly_trend') }}";
+const categoryUrl = "{{ url_for('dashboard.api_expenses_by_category') }}";
+
+async function loadTrend(months) {
+    const res = await fetch(trendUrl + '?months=' + months);
+    const data = await res.json();
+    trendChart.data.labels = data.map(d => d.month_short);
+    trendChart.data.datasets[0].data = data.map(d => d.income);
+    trendChart.data.datasets[1].data = data.map(d => d.expenses);
+    trendChart.update();
+}
+
+async function loadCategories() {
+    const res = await fetch(categoryUrl);
+    const data = await res.json();
+    if (!data.length) {
+        categoryChart.data.labels = ['Aucune donnée'];
+        categoryChart.data.datasets[0].data = [1];
+        categoryChart.data.datasets[0].backgroundColor = ['#e2e8f0'];
+    } else {
+        categoryChart.data.labels = data.map(d => d.name);
+        categoryChart.data.datasets[0].data = data.map(d => d.amount);
+        categoryChart.data.datasets[0].backgroundColor = data.map(d => d.color);
+    }
+    categoryChart.update();
+}
+
+const trendChart = new Chart(document.getElementById('trendChart'), {
+    type: 'bar',
+    data: {
+        labels: [],
+        datasets: [
+            { label: 'Revenus', backgroundColor: 'rgba(16,185,129,0.7)', data: [] },
+            { label: 'Dépenses', backgroundColor: 'rgba(239,68,68,0.7)', data: [] }
+        ]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { position: 'bottom' } }
+    }
+});
+
+const categoryChart = new Chart(document.getElementById('categoryChart'), {
+    type: 'doughnut',
+    data: { labels: [], datasets: [{ data: [], backgroundColor: [] }] },
+    options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+});
+
+document.getElementById('trend-months').addEventListener('change', (e) => loadTrend(e.target.value));
+loadTrend(6);
+loadCategories();
+</script>
+{% endblock %}

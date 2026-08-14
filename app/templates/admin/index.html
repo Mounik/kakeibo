@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% block page_title %}Administration{% endblock %}
+{% block content %}
+<div class="row g-4 mb-4">
+    <div class="col-6 col-md-4 col-lg-2">
+        <div class="card stat-card shadow-sm">
+            <div class="card-body">
+                <div class="stat-icon bg-primary-subtle text-primary"><i class="bi bi-people"></i></div>
+                <div class="stat-value">{{ stats.users }}</div>
+                <div class="stat-label">Utilisateurs</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-lg-2">
+        <div class="card stat-card shadow-sm">
+            <div class="card-body">
+                <div class="stat-icon bg-success-subtle text-success"><i class="bi bi-wallet2"></i></div>
+                <div class="stat-value">{{ stats.accounts }}</div>
+                <div class="stat-label">Comptes</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-lg-2">
+        <div class="card stat-card shadow-sm">
+            <div class="card-body">
+                <div class="stat-icon bg-danger-subtle text-danger"><i class="bi bi-arrow-up-circle"></i></div>
+                <div class="stat-value">{{ '%.2f'|format(stats.expenses) }} €</div>
+                <div class="stat-label">Dépenses totales</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-lg-2">
+        <div class="card stat-card shadow-sm">
+            <div class="card-body">
+                <div class="stat-icon bg-primary-subtle text-primary"><i class="bi bi-arrow-down-circle"></i></div>
+                <div class="stat-value">{{ '%.2f'|format(stats.incomes) }} €</div>
+                <div class="stat-label">Revenus totaux</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-lg-2">
+        <div class="card stat-card shadow-sm">
+            <div class="card-body">
+                <div class="stat-icon bg-warning-subtle text-warning"><i class="bi bi-pie-chart"></i></div>
+                <div class="stat-value">{{ stats.budgets }}</div>
+                <div class="stat-label">Budgets</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-lg-2">
+        <div class="card stat-card shadow-sm">
+            <div class="card-body">
+                <div class="stat-icon bg-info-subtle text-info"><i class="bi bi-tags"></i></div>
+                <div class="stat-value">{{ stats.categories }}</div>
+                <div class="stat-label">Catégories</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="bi bi-people me-2"></i>Gestion des utilisateurs</h5>
+        <a href="{{ url_for('admin.users') }}" class="btn btn-sm btn-primary">Voir tous les utilisateurs</a>
+    </div>
+</div>
+{% endblock %}

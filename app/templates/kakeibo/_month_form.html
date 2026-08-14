@@ -1,0 +1,26 @@
+<div class="card shadow-sm">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="bi bi-journal-bookmark me-2"></i>{{ today.strftime('%B %Y')|capitalize }}</h5>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info small">
+            <i class="bi bi-info-circle me-1"></i>
+            Répondez aux quatre questions fondamentales de la méthode Kakeibo pour ce mois.
+        </div>
+        <form method="post" action="{{ url_for('kakeibo.month') }}" novalidate>
+            {{ form.hidden_tag() }}
+            {% for field in [form.q1_income, form.q2_savings_target, form.q3_planned_expenses, form.q4_improvement, form.notes] %}
+            <div class="mb-3">
+                {{ field.label(class='form-label fw-semibold') }}
+                {% if field.description %}<div class="form-text mb-1">{{ field.description }}</div>{% endif %}
+                {{ field(class='form-control' + (' is-invalid' if field.errors else ''), rows=3) }}
+                {% for error in field.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+            </div>
+            {% endfor %}
+            <div class="d-flex gap-2">
+                {{ form.submit(class='btn btn-primary') }}
+                <a href="{{ url_for('kakeibo.index') }}" class="btn btn-light">Retour</a>
+            </div>
+        </form>
+    </div>
+</div>

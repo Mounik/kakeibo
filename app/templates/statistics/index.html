@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+{% block page_title %}Statistiques{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div class="text-muted">Analysez vos habitudes de consommation</div>
+    <div class="d-flex gap-2 align-items-center">
+        <select id="year-select" class="form-select form-select-sm w-auto">
+            {% for y in years %}
+            <option value="{{ y }}" {% if y == today.year %}selected{% endif %}>{{ y }}</option>
+            {% endfor %}
+        </select>
+        <select id="month-select" class="form-select form-select-sm w-auto">
+            <option value="">Année complète</option>
+            {% for m in range(1, 13) %}
+            <option value="{{ m }}" {% if m == today.month %}selected{% endif %}>{{ '%02d'|format(m) }}</option>
+            {% endfor %}
+        </select>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header"><h5 class="mb-0"><i class="bi bi-pie-chart me-2"></i>Dépenses par catégorie</h5></div>
+            <div class="card-body"><canvas id="catChart" height="280"></canvas></div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header"><h5 class="mb-0"><i class="bi bi-columns me-2"></i>Répartition Kakeibo</h5></div>
+            <div class="card-body"><canvas id="kakeiboChart" height="280"></canvas></div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-header"><h5 class="mb-0"><i class="bi bi-calendar3 me-2"></i>Évolution annuelle ({{ today.year }})</h5></div>
+            <div class="card-body"><canvas id="annualChart" height="280"></canvas></div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header"><h5 class="mb-0"><i class="bi bi-percent me-2"></i>Taux d'épargne</h5></div>
+            <div class="card-body"><canvas id="rateChart" height="280"></canvas></div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-12">
+        <div class="card shadow-sm">
+            <div class="card-header"><h5 class="mb-0"><i class="bi bi-piggy-bank me-2"></i>Évolution de l'épargne</h5></div>
+            <div class="card-body"><canvas id="savingsChart" height="260"></canvas></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const currentYear = {{ today.year }};
+
+const catChart = new Chart(document.getElementById('catChart'), {
+    type: 'doughnut',
+    data: { labels: [], datasets: [{ data: [], backgroundColor: [] }] },
+    options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+});
+
+const kakeiboChart = new Chart(document.getElementById('kakeiboChart'), {
+    type: 'polarArea',
+    data: { labels: [], datasets: [{ data: [], backgroundColor: [] }] },
+    options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+});
+
+const annualChart = new Chart(document.getElementById('annualChart'), {
+    type: 'bar',
+    data: {
+        labels: [],
+        datasets: [
+            { label: 'Revenus', backgroundColor: 'rgba(16,185,129,0.7)', data: [] },
+            { label: 'Dépenses', backgroundColor: 'rgba(239,68,68,0.7)', data: [] }
+        ]
+    },
+    options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+});
+
+const rateChart = new Chart(document.getElementById('rateChart'), {
+    type: 'line',
+    data: {
+        labels: [],
+        datasets: [{
+            label: 'Taux d\'épargne (%)',
+            borderColor: '#f59e0b',
+            backgroundColor: 'rgba(245,158,11,0.1)',
+            fill: true,
+            data: []
+        }]
+    },
+    options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+});
+
+const savingsChart = new Chart(document.getElementById('savingsChart'), {
+    type: 'bar',
+    data: {
+        labels: [],
+        datasets: [
+            { label: 'Revenus', backgroundColor: 'rgba(16,185,129,0.7)', data: [] },
+            { label: 'Dépenses', backgroundColor: 'rgba(239,68,68,0.7)', data: [] },
+            { label: 'Épargne', backgroundColor: 'rgba(59,130,246,0.7)', data: [] }
+        ]
+    },
+    options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+});
+
+function periodParams() {
+    const year = document.getElementById('year-select').value;
+    const month = document.getElementById('month-select').value;
+    return 'year=' + year + (month ? '&month=' + month : '');
+}
+
+async function refresh() {
+    const params = periodParams();
+
+    let res = await fetch("{{ url_for('statistics.api_expenses_by_category') }}?" + params);
+    let data = await res.json();
+    if (!data.length) {
+        catChart.data.labels = ['Aucune donnée'];
+        catChart.data.datasets[0].data = [1];
+        catChart.data.datasets[0].backgroundColor = ['#e2e8f0'];
+    } else {
+        catChart.data.labels = data.map(d => d.name);
+        catChart.data.datasets[0].data = data.map(d => d.amount);
+        catChart.data.datasets[0].backgroundColor = data.map(d => d.color);
+    }
+    catChart.update();
+
+    res = await fetch("{{ url_for('statistics.api_kakeibo_breakdown') }}?" + params);
+    data = await res.json();
+    kakeiboChart.data.labels = data.map(d => d.name);
+    kakeiboChart.data.datasets[0].data = data.map(d => d.amount);
+    kakeiboChart.data.datasets[0].backgroundColor = data.map(d => d.color);
+    kakeiboChart.update();
+
+    res = await fetch("{{ url_for('statistics.api_annual') }}?year=" + document.getElementById('year-select').value);
+    data = await res.json();
+    annualChart.data.labels = data.map(d => d.label);
+    annualChart.data.datasets[0].data = data.map(d => d.income);
+    annualChart.data.datasets[1].data = data.map(d => d.expenses);
+    annualChart.update();
+
+    res = await fetch("{{ url_for('statistics.api_savings_rate') }}?months=6");
+    data = await res.json();
+    rateChart.data.labels = data.map(d => d.month_short);
+    rateChart.data.datasets[0].data = data.map(d => d.rate);
+    rateChart.update();
+
+    res = await fetch("{{ url_for('statistics.api_savings_evolution') }}?years=3");
+    data = await res.json();
+    savingsChart.data.labels = data.map(d => d.year);
+    savingsChart.data.datasets[0].data = data.map(d => d.income);
+    savingsChart.data.datasets[1].data = data.map(d => d.expenses);
+    savingsChart.data.datasets[2].data = data.map(d => d.savings);
+    savingsChart.update();
+}
+
+document.getElementById('year-select').addEventListener('change', refresh);
+document.getElementById('month-select').addEventListener('change', refresh);
+refresh();
+</script>
+{% endblock %}

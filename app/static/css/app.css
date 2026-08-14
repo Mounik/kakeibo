@@ -1,0 +1,197 @@
+:root {
+    --kakeibo-sidebar-bg: #0f172a;
+    --kakeibo-sidebar-active: rgba(20, 184, 166, 0.15);
+    --kakeibo-sidebar-color: #94a3b8;
+}
+
+body.logged-in {
+    background-color: #f1f5f9;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+.app-wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 250px;
+    flex-shrink: 0;
+    background: var(--kakeibo-sidebar-bg);
+    color: var(--kakeibo-sidebar-color);
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+}
+
+.sidebar-header {
+    padding: 1.25rem 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.sidebar .brand {
+    color: #fff;
+    text-decoration: none;
+    font-size: 1.25rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.sidebar .brand i {
+    color: #14b8a6;
+    font-size: 1.5rem;
+}
+
+.sidebar .nav {
+    flex: 1;
+    padding: 0.75rem 0;
+    overflow-y: auto;
+}
+
+.sidebar .nav-link {
+    color: var(--kakeibo-sidebar-color);
+    padding: 0.6rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    font-size: 0.9rem;
+    border-left: 3px solid transparent;
+}
+
+.sidebar .nav-link i {
+    width: 1.2rem;
+    text-align: center;
+}
+
+.sidebar .nav-link:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.sidebar .nav-link.active {
+    color: #14b8a6;
+    background: var(--kakeibo-sidebar-active);
+    border-left-color: #14b8a6;
+    font-weight: 600;
+}
+
+.sidebar .nav-link .badge {
+    margin-left: auto;
+}
+
+.sidebar-footer {
+    padding: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.sidebar-footer a {
+    color: var(--kakeibo-sidebar-color);
+}
+
+.sidebar-footer a:hover {
+    color: #fff;
+}
+
+.main-content {
+    flex: 1;
+    padding: 2rem 2.5rem;
+    overflow-x: hidden;
+}
+
+/* Stats cards */
+.stat-card .card-body {
+    padding: 1.25rem;
+}
+
+.stat-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+    margin-bottom: 0.75rem;
+}
+
+.stat-value {
+    font-size: 1.4rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: #64748b;
+}
+
+/* Account icon */
+.account-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+}
+
+/* Auth */
+.auth-shell {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #0f172a 0%, #134e4a 100%);
+    padding: 1rem;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 420px;
+    border: none;
+    border-radius: 16px;
+}
+
+.auth-icon {
+    font-size: 3rem;
+    color: #14b8a6;
+}
+
+.auth-shell-inner {
+    width: 100%;
+    max-width: 480px;
+    color: #f8fafc;
+}
+
+/* Tables */
+.table thead th {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: #64748b;
+}
+
+.card-header {
+    background-color: #fff;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .sidebar {
+        position: static;
+        width: 100%;
+        height: auto;
+        flex-direction: column;
+    }
+    .app-wrapper {
+        flex-direction: column;
+    }
+    .main-content {
+        padding: 1.25rem;
+    }
+}

@@ -1,0 +1,63 @@
+{% macro render_field(field, with_label=True, placeholder=None) %}
+<div class="mb-3{% if field.errors %} is-invalid-wrapper{% endif %}">
+    {% if with_label and field.type != 'CSRFTokenField' %}
+        {{ field.label(class='form-label') }}
+    {% endif %}
+    {% if field.type == 'BooleanField' %}
+        <div class="form-check">
+            {{ field(class='form-check-input') }}
+            {{ field.label(class='form-check-label') }}
+        </div>
+    {% elif field.type == 'TextAreaField' %}
+        {{ field(class='form-control' + (' is-invalid' if field.errors else ''), rows=4, **kwargs) }}
+        {% if field.description %}<div class="form-text">{{ field.description }}</div>{% endif %}
+    {% else %}
+        {{ field(class='form-control' + (' is-invalid' if field.errors else ''), placeholder=placeholder, **kwargs) }}
+        {% if field.description %}<div class="form-text">{{ field.description }}</div>{% endif %}
+    {% endif %}
+    {% for error in field.errors %}
+        <div class="invalid-feedback d-block">{{ error }}</div>
+    {% endfor %}
+</div>
+{% endmacro %}
+
+
+{% macro render_pagination(pagination) %}
+{% if pagination.pages > 1 %}
+<nav aria-label="Pagination">
+    <ul class="pagination pagination-sm">
+        <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
+            <a class="page-link" href="{{ url_for(request.endpoint, page=pagination.prev_num, **request.view_args or {}) }}" tabindex="-1">Précédent</a>
+        </li>
+        {% for page in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+            {% if page %}
+            <li class="page-item {% if page == pagination.page %}active{% endif %}">
+                <a class="page-link" href="{{ url_for(request.endpoint, page=page, **request.view_args or {}) }}">{{ page }}</a>
+            </li>
+            {% else %}
+            <li class="page-item disabled"><span class="page-link">…</span></li>
+            {% endif %}
+        {% endfor %}
+        <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+            <a class="page-link" href="{{ url_for(request.endpoint, page=pagination.next_num, **request.view_args or {}) }}">Suivant</a>
+        </li>
+    </ul>
+</nav>
+{% endif %}
+{% endmacro %}
+
+
+{% macro format_amount(value) %}
+{% if value is not none %}{{ '%.2f'|format(value|float) }} €{% endif %}
+{% endmacro %}
+
+
+{% macro empty_state(icon, text, action_url=None, action_label=None) %}
+<div class="empty-state text-center py-5">
+    <i class="bi {{ icon }} fs-1 text-muted"></i>
+    <p class="text-muted mt-3">{{ text }}</p>
+    {% if action_url and action_label %}
+    <a href="{{ action_url }}" class="btn btn-primary mt-2">{{ action_label }}</a>
+    {% endif %}
+</div>
+{% endmacro %}

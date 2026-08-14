@@ -1,0 +1,47 @@
+# ─── Environnement et secrets ───────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# ─── Python ──────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+*.dist-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+env/
+
+# ─── Tests / qualité ─────────────────────────────────────────────────────────
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.nox/
+
+# ─── IDE ─────────────────────────────────────────────────────────────────────
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# ─── Données et logs ─────────────────────────────────────────────────────────
+data/*.db
+data/*.sqlite
+data/*.sqlite3
+data/logs/
+data/uploads/
+data/backups/
+instance/
+*.log

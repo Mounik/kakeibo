@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% from 'macros.html' import render_field %}
+{% block page_title %}Mon profil{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-person me-2"></i>Informations personnelles</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" novalidate>
+                    {{ form.hidden_tag() }}
+                    <div class="row">
+                        <div class="col-md-6">{{ render_field(form.first_name) }}</div>
+                        <div class="col-md-6">{{ render_field(form.last_name) }}</div>
+                    </div>
+                    {{ render_field(form.email) }}
+                    <div class="row">
+                        <div class="col-md-4">{{ render_field(form.locale) }}</div>
+                        <div class="col-md-4">{{ render_field(form.currency) }}</div>
+                        <div class="col-md-4">{{ render_field(form.theme) }}</div>
+                    </div>
+                    {{ render_field(form.timezone) }}
+                    <button type="submit" class="btn btn-primary">{{ form.submit.label.text }}</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% from 'macros.html' import empty_state %}
+{% block page_title %}Notifications{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="text-muted">{{ unread }} non lue(s) sur {{ notifications|length }}</div>
+    {% if unread %}
+    <form method="post" action="{{ url_for('notifications.mark_all_read') }}">
+        <button type="submit" class="btn btn-sm btn-outline-primary"><i class="bi bi-check2-all me-1"></i>Tout marquer comme lu</button>
+    </form>
+    {% endif %}
+</div>
+
+{% if notifications %}
+<div class="card shadow-sm">
+    <div class="list-group list-group-flush">
+        {% for notification in notifications %}
+        <div class="list-group-item d-flex justify-content-between align-items-start {{ '' if notification.is_read else 'bg-primary-subtle' }}">
+            <div class="ms-2 me-auto">
+                <div class="fw-semibold">
+                    <i class="bi bi-{{ 'bell-fill' if notification.type == 'warning' else 'info-circle' }} me-2"></i>
+                    {{ notification.title }}
+                    {% if not notification.is_read %}<span class="badge bg-primary ms-1">Nouveau</span>{% endif %}
+                </div>
+                <div class="small text-muted">{{ notification.message }}</div>
+                <div class="small text-muted mt-1">{{ notification.created_at.strftime('%d/%m/%Y %H:%M') }}</div>
+            </div>
+            <div class="d-flex gap-1">
+                {% if not notification.is_read %}
+                <form method="post" action="{{ url_for('notifications.mark_read', id=notification.id) }}">
+                    <button type="submit" class="btn btn-sm btn-outline-primary" title="Marquer comme lu"><i class="bi bi-check2"></i></button>
+                </form>
+                {% endif %}
+                <form method="post" action="{{ url_for('notifications.delete', id=notification.id) }}"
+                      onsubmit="return confirm('Supprimer cette notification ?');">
+                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Supprimer"><i class="bi bi-trash"></i></button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% else %}
+{{ empty_state('bi-bell', 'Aucune notification.', url_for('dashboard.index'), 'Retour au tableau de bord') }}
+{% endif %}
+{% endblock %}
